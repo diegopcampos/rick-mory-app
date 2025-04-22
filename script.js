@@ -1,17 +1,17 @@
-fetch('https://rickandmortyapi.com/api/character', {
-    method: 'GET'
-})
-.then((response) => response.json()) 
-.then((json) => {
+async function carregarPersonagens() {
+    const dadosResponse = await fetch('https://rickandmortyapi.com/api/character');
+    const dados = await dadosResponse.json();
 
-    var containerDiv = document.querySelector('.container');
+    const containerDiv = document.querySelector('.container');
 
-    json.results.map((results) => {
+    dados.results.map((character) => {
         containerDiv.innerHTML +=
-            `<div><img src="${results.image}"></div><br>
-            <strong>`+ results.name +`</strong><br>
-            <span>`+ results.species +`</span><br>
-            <i>`+ results.status +`</i>
-            <hr>`;
+            `<div><img src="${character.image}"></div><br>
+             <strong>${character.name}</strong><br>
+             <span>${character.species}</span><br>
+             <i>${character.status}</i>
+             <hr>`;
     });
-});
+}
+
+document.addEventListener("DOMContentLoaded", carregarPersonagens);
