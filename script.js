@@ -5,16 +5,24 @@ const content = document.getElementById('content');
 const conteinerResult = document.getElementById('result-style');
 const image = document.getElementById('img');
 
-const fetchApi = (value) => {
-  const result = fetch(`https://rickandmortyapi.com/api/character/${value}`)
-  .then((res) => res.json())
-  .then((data) => {
-    console.log(data);
-    return data;
-  });
+characterId.addEventListener('keydown', function (event) {
+  const invalidKeys = ['e', 'E', '+', '-', ','];
 
-  return result;
-}
+  if (invalidKeys.includes(event.key)) {
+    event.preventDefault();
+    alert('❌ Apenas números inteiros positivos são permitidos!');
+  }
+});
+
+
+const fetchApi = (value) => {
+  return fetch(`https://rickandmortyapi.com/api/character/${value}`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      return data;
+    });
+};
 
 const keys = ['name', 'status', 'species', 'gender', 'origin', 'episode'];
 const newKeys = {
@@ -24,47 +32,47 @@ const newKeys = {
   gender: 'Gênero',
   origin: 'Planeta de origem',
   episode: 'Episódios',
-}
+};
 
 const buildResult = (result) => {
   return keys.map((key) => document.getElementById(key))
     .map((elem) => {
-      if(elem.checked === true && (Array.isArray(result[elem.name])) === true){
+      if (elem.checked === true && Array.isArray(result[elem.name])) {
         const arrayResult = result[elem.name].join('\r\n');
-        console.log(arrayResult);
         const newElem = document.createElement('p');
-        newElem.innerHTML = `${newKeys[elem.name]}: ${arrayResult}`;
+        newElem.innerHTML = `📺 ${newKeys[elem.name]}: ${arrayResult}`;
         content.appendChild(newElem);
-      } else if(elem.checked === true && (elem.name === 'origin')){
+      } else if (elem.checked === true && elem.name === 'origin') {
         const newElem = document.createElement('p');
-        newElem.innerHTML = `${newKeys[elem.name]}: ${result[elem.name].name}`;
+        newElem.innerHTML = `🪐 ${newKeys[elem.name]}: ${result[elem.name].name}`;
         content.appendChild(newElem);
-      } else if(elem.checked === true && typeof(result[elem.name]) !== 'object'){
+      } else if (elem.checked === true && typeof result[elem.name] !== 'object') {
         const newElem = document.createElement('p');
-        newElem.innerHTML = `${newKeys[elem.name]}: ${result[elem.name]}`;
+        newElem.innerHTML = `🧾 ${newKeys[elem.name]}: ${result[elem.name]}`;
         content.appendChild(newElem);
       }
     });
-}
+};
 
 btnGo.addEventListener('click', async (event) => {
   event.preventDefault();
 
-  if(characterId.value === ''){
-    return content.innerHTML = 'É necessário fazer um filtro.';
+  const id = characterId.value.trim();
+
+  if (id === '') {
+    return alert('🚨 Por favor, insira um ID!');
   }
 
-  const result = await fetchApi(characterId.value);
-  if(content.firstChild === null){
-    conteinerResult.className = 'result-style';
-    image.src = `${result.image}`;
-    buildResult(result);
-  } else {
-    content.innerHTML = '';
-    conteinerResult.className = 'result-style';
-    image.src = `${result.image}`;
-    buildResult(result);
+  if (isNaN(id) || Number(id) <= 0) {
+    return alert('🚫 O ID deve ser um número positivo! Nada de letras ou números negativos. 🙃');
   }
+
+  const result = await fetchApi(id);
+
+  content.innerHTML = '';
+  conteinerResult.className = 'result-style';
+  image.src = `${result.image}`;
+  buildResult(result);
 });
 
 btnReset.addEventListener('click', () => location.reload());
